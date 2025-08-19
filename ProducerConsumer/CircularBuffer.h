@@ -6,28 +6,23 @@
 #include <array>
 #include <condition_variable>
 #include <mutex>
+#include <semaphore>
 
 namespace Parallelity
 {
-    class CircularBuffer
-    {
-    public:
-        void Write(BufferBlock block);
-        BufferBlock Read();
-        bool HasBlock() const;
-        bool HasFreeBlock() const;
-        void Stop();
-        inline bool IsStopped() const
-        {
-            return _done;
-        }
+	class CircularBuffer
+	{
+	public:
+		void Write(BufferBlock block);
+		BufferBlock Read();
 
-    private:
-        alignas(64) std::array<BufferBlock, kCapacity> _buffer;
-        alignas(64) uint32_t _usedBlocks { 0 };
-        mutable volatile bool _done = false;
-        mutable std::condition_variable full;
-        mutable std::condition_variable empty;
-        mutable std::mutex _mutex;
-    };
+	private:
+		alignas(64) std::array<BufferBlock, kCapacity> _mBuffer;
+		std::atomic<size_t> _mWriteIndex = 0;
+		std::atomic<size_t> _mReadIndex = 0;
+
+		std::counting_semaphore<kCapacity> _mReadLimiter{ 0 };
+		std::counting_semaphore<kCapacity> _mWriteLimiter{ kCapacity };
+		std::mutex _mMmutex;
+	};
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cassert>
 #include "Counter.h"
@@ -9,12 +9,12 @@
 
 namespace Parallelity
 {
-    class Consumer
-    {
+    class Consumer {
     public:
         Consumer(Counter& counter);
 
-        void operator<<(CircularBuffer& buffer);
+    public:
+        void Run(CircularBuffer& buffer);
 
     private:
         Counter& _counter;

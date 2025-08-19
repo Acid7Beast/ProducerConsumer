@@ -1,54 +1,32 @@
-#include "CircularBuffer.h"
+﻿#include "CircularBuffer.h"
 
 #include <cassert>
 
 namespace Parallelity
 {
-	void CircularBuffer::Write(BufferBlock block)
-	{
-		std::unique_lock tmpMutex{ _mutex };
-		full.wait(tmpMutex, [&] { return _usedBlocks < kCapacity; });
+    void CircularBuffer::Write(BufferBlock block) {
+        _mWriteLimiter.acquire();
 
-		assert(_usedBlocks >= 0 && _usedBlocks < kCapacity);
-		_buffer[_usedBlocks++] = block;
+        {
+            std::scoped_lock lock(_mMmutex);
+            _mBuffer[_mWriteIndex] = block;
+            _mWriteIndex = (_mWriteIndex + 1) % kCapacity;
+        }
 
-		empty.notify_one();
-	}
+        _mReadLimiter.release();
+    }
 
-	BufferBlock CircularBuffer::Read()
-	{
-		BufferBlock result;
-		std::unique_lock tmpMutex{ _mutex };
-		empty.wait(tmpMutex, [&] { return _usedBlocks > 0 || _done; });
+    BufferBlock CircularBuffer::Read() {
+        _mReadLimiter.acquire();
 
-		if (_done)
-		{
-			Stop();
-			if (_usedBlocks == 0)
-			{
-				return result;
-			}
-		}
-		result = _buffer[--_usedBlocks];
-		assert(_usedBlocks >= 0 && _usedBlocks < kCapacity);
+        BufferBlock result;
+        {
+            std::scoped_lock lock(_mMmutex);
+            result = _mBuffer[_mReadIndex];
+            _mReadIndex = (_mReadIndex + 1) % kCapacity;
+        }
 
-		full.notify_one();
-		return result;
-	}
-
-	bool CircularBuffer::HasBlock() const
-	{
-		return _usedBlocks > 0;
-	}
-
-	bool CircularBuffer::HasFreeBlock() const
-	{
-		return _usedBlocks < kCapacity;
-	}
-
-	void CircularBuffer::Stop()
-	{
-		_done = true;
-		empty.notify_one();
-	}
+        _mWriteLimiter.release();
+        return result;
+    }
 }

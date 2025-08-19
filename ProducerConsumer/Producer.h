@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CircularBuffer.h"
 #include "BufferBlock.h"
@@ -9,16 +9,14 @@
 
 namespace Parallelity
 {
-	class Producer
-	{
-	public:
-		Producer(const std::string& fileName);
+    class Producer {
+    public:
+        Producer(const std::string& fileName);
 
-		void operator>>(CircularBuffer& buffer);
-		bool Reading() const;
+    public:
+        void Run(CircularBuffer& buffer);
 
-	private:
-		std::ifstream _reader;
-		std::atomic<bool> _hasMoreData = true;
-	};
+    private:
+        std::ifstream _mReader;
+    };
 }

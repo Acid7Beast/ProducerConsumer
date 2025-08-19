@@ -1,0 +1,59 @@
+## Ignore Visual Studio temporary files, build results, and user settings
+
+# Visual Studio files
+.vs
+.suo
+.user
+.userosscache
+.sln.docstates
+
+# Build results
+[Dd]ebug
+[Rr]elease
+x64
+x86
+build
+.bak
+.exe
+.dll
+.pdb
+.obj
+.o
+.lib
+.ncb
+.aps
+.tlog
+.idb
+.iobj
+.ipch
+
+# User-specific settings
+.VC.db
+.VC.VC.opendb
+.log
+.plg
+.filters
+.sdf
+
+# Resharper and other IDE settings
+_ReSharper.
+.DotSettings
+
+# Visual Studio Code
+.vscode
+
+# NuGet packages
+packages
+
+# Misc
+.opensdf
+.opendb
+ipch
+.pgc
+.pgd
+
+# Recommended files by Visual Studio templates
+# To be ignored unless they are a core part of the project
+.sln
+.vcxproj
+.vcxproj.user
